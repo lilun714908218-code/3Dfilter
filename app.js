@@ -254,19 +254,19 @@ function buildConfigFromRaw(raw) {
 function captureRawFilters() {
   return {
     excludeDigits: [...excludedDigitsByButtons].sort((a, b) => a - b),
-    includeDigits: els.includeDigits.value,
-    excludeSums: els.excludeSums.value,
-    includeSumTails: els.includeSumTails.value,
-    excludeSumTails: els.excludeSumTails.value,
-    sumMin: els.sumMin.value,
-    sumMax: els.sumMax.value,
-    spanMin: els.spanMin.value,
-    spanMax: els.spanMax.value,
-    patternType: els.patternType.value,
-    playMode: els.playMode.value,
-    consecutiveType: els.consecutiveType.value,
-    excludePair: els.excludePair.checked,
-    excludeTriplet: els.excludeTriplet.checked,
+    includeDigits: els.includeDigits ? els.includeDigits.value : "",
+    excludeSums: els.excludeSums ? els.excludeSums.value : "",
+    includeSumTails: els.includeSumTails ? els.includeSumTails.value : "",
+    excludeSumTails: els.excludeSumTails ? els.excludeSumTails.value : "",
+    sumMin: els.sumMin ? els.sumMin.value : "",
+    sumMax: els.sumMax ? els.sumMax.value : "",
+    spanMin: els.spanMin ? els.spanMin.value : "",
+    spanMax: els.spanMax ? els.spanMax.value : "",
+    patternType: els.patternType ? els.patternType.value : "all",
+    playMode: els.playMode ? els.playMode.value : "direct",
+    consecutiveType: els.consecutiveType ? els.consecutiveType.value : "all",
+    excludePair: els.excludePair ? els.excludePair.checked : false,
+    excludeTriplet: els.excludeTriplet ? els.excludeTriplet.checked : false,
     danmaDigits: "",
     killDigits: "",
     oddCounts: "",
@@ -352,6 +352,7 @@ function isMobileViewport() {
 }
 
 function getValuesFromInput(input) {
+  if (!input || typeof input.value !== "string") return [];
   return input.value
     .split(/[,\uff0c\s;；、|]+/)
     .map((s) => s.trim())
@@ -492,6 +493,7 @@ function clearPickerSelection(inputId) {
 }
 
 function renderExcludeDigitButtons() {
+  if (!els.excludeDigitsButtons) return;
   const buttons = els.excludeDigitsButtons.querySelectorAll(".digit-btn");
   buttons.forEach((btn) => {
     const digit = Number(btn.dataset.digit);
@@ -504,8 +506,8 @@ function resetVisibleFiltersAfterRun() {
   excludedDigitsByButtons.clear();
   renderExcludeDigitButtons();
   clearPickerSelection("includeDigits");
-  els.excludePair.checked = false;
-  els.excludeTriplet.checked = false;
+  if (els.excludePair) els.excludePair.checked = false;
+  if (els.excludeTriplet) els.excludeTriplet.checked = false;
   refreshAllQuickPickers();
   closeQuickFilterPanels();
   updateQuickFilterButtons();
@@ -636,18 +638,18 @@ function reset() {
   excludedDigitsByButtons.clear();
   renderExcludeDigitButtons();
   clearPickerSelection("includeDigits");
-  els.excludeSums.value = "";
-  els.includeSumTails.value = "";
-  els.excludeSumTails.value = "";
-  els.sumMin.value = "";
-  els.sumMax.value = "";
-  els.spanMin.value = "";
-  els.spanMax.value = "";
-  els.patternType.value = "all";
-  els.playMode.value = "direct";
-  els.consecutiveType.value = "all";
-  els.excludePair.checked = false;
-  els.excludeTriplet.checked = false;
+  if (els.excludeSums) els.excludeSums.value = "";
+  if (els.includeSumTails) els.includeSumTails.value = "";
+  if (els.excludeSumTails) els.excludeSumTails.value = "";
+  if (els.sumMin) els.sumMin.value = "";
+  if (els.sumMax) els.sumMax.value = "";
+  if (els.spanMin) els.spanMin.value = "";
+  if (els.spanMax) els.spanMax.value = "";
+  if (els.patternType) els.patternType.value = "all";
+  if (els.playMode) els.playMode.value = "direct";
+  if (els.consecutiveType) els.consecutiveType.value = "all";
+  if (els.excludePair) els.excludePair.checked = false;
+  if (els.excludeTriplet) els.excludeTriplet.checked = false;
   refreshAllQuickPickers();
   els.count.textContent = "0";
   els.result.value = "";

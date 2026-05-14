@@ -508,6 +508,7 @@ textarea {
 }
 
 .right-col > .fold,
+.left-col,
 .left-col .digit-filter,
 .left-col label:has(#includeDigits),
 .left-col label:has(#includeDigitsOld),
@@ -522,6 +523,26 @@ label:has(#excludeSumTails),
 }
 
 @media (min-width: 1081px) {
+  .app-layout {
+    display: block;
+  }
+
+  .right-col,
+  .global-run-bar,
+  .result-panel {
+    width: 100%;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  textarea#result {
+    height: min(60vh, 640px);
+    min-height: 360px;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
   .left-col {
     order: 2;
   }
