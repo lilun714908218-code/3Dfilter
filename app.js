@@ -464,6 +464,15 @@ function renderExcludeDigitButtons() {
   });
 }
 
+function resetVisibleFiltersAfterRun() {
+  excludedDigitsByButtons.clear();
+  renderExcludeDigitButtons();
+  els.includeDigits.value = "";
+  els.excludePair.checked = false;
+  els.excludeTriplet.checked = false;
+  refreshAllQuickPickers();
+}
+
 function loadHistory() {
   try {
     const raw = localStorage.getItem(HISTORY_STORAGE_KEY);
@@ -572,6 +581,7 @@ function run() {
     els.count.textContent = String(list.length);
     els.result.value = list.join(", ");
     if (els.sourceScope && list.length > 0) els.sourceScope.value = "result";
+    resetVisibleFiltersAfterRun();
     if (els.result && typeof els.result.scrollIntoView === "function") {
       const target = isMobileViewport() ? els.result.closest(".result-panel") : els.result;
       (target || els.result).scrollIntoView({ behavior: "smooth", block: "nearest" });
