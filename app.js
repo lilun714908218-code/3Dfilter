@@ -285,6 +285,31 @@ function buildConfig() {
   return buildConfigFromRaw(captureRawFilters());
 }
 
+function rememberUndoState() {
+  undoStack.push({
+    count: els.count ? els.count.textContent : "0",
+    result: els.result ? els.result.value : "",
+    sourceScope: els.sourceScope ? els.sourceScope.value : "full"
+  });
+  if (undoStack.length > 20) undoStack.shift();
+}
+
+function undoLastChange() {
+  const previous = undoStack.pop();
+  if (!previous) {
+    alert("没有可以后退的步骤");
+    return;
+  }
+  if (els.count) els.count.textContent = previous.count;
+  if (els.result) els.result.value = previous.result;
+  if (els.sourceScope) els.sourceScope.value = previous.sourceScope;
+  syncPasteModeVisual();
+  if (els.result && typeof els.result.scrollIntoView === "function") {
+    const target = isMobileViewport() ? els.result.closest(".result-panel") : els.result;
+    (target || els.result).scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+}
+
 const els = {
   excludeDigitsButtons: document.getElementById("excludeDigitsButtons"),
   includeDigits: document.getElementById("includeDigits"),
@@ -308,6 +333,7 @@ const els = {
   historyList: document.getElementById("historyList"),
   sourceScope: document.getElementById("sourceScope"),
   runBtn: document.getElementById("runBtn"),
+  undoBtn: document.getElementById("undoBtn"),
   clearResultBtn: document.getElementById("clearResultBtn"),
   resetBtn: document.getElementById("resetBtn"),
   customPool: document.getElementById("customPool"),
@@ -318,6 +344,7 @@ const els = {
 
 const HISTORY_STORAGE_KEY = "lottery3d_history_v1";
 let historyRecords = [];
+const undoStack = [];
 const excludedDigitsByButtons = new Set();
 
 function isMobileViewport() {
@@ -541,6 +568,7 @@ function run() {
   try {
     const config = buildConfig();
     const list = filterNumbers(getFilterSource(), config);
+    rememberUndoState();
     els.count.textContent = String(list.length);
     els.result.value = list.join(", ");
     if (els.sourceScope && list.length > 0) els.sourceScope.value = "result";
@@ -554,6 +582,7 @@ function run() {
 }
 
 function reset() {
+  rememberUndoState();
   excludedDigitsByButtons.clear();
   renderExcludeDigitButtons();
   els.includeDigits.value = "";
@@ -577,6 +606,7 @@ function reset() {
 }
 
 function clearResultOnly() {
+  rememberUndoState();
   els.count.textContent = "0";
   els.result.value = "";
   if (els.sourceScope) els.sourceScope.value = "full";
@@ -584,6 +614,7 @@ function clearResultOnly() {
 }
 
 if (els.runBtn) els.runBtn.addEventListener("click", run);
+if (els.undoBtn) els.undoBtn.addEventListener("click", undoLastChange);
 if (els.clearResultBtn) els.clearResultBtn.addEventListener("click", clearResultOnly);
 if (els.resetBtn) els.resetBtn.addEventListener("click", reset);
 if (els.clearCustomPoolBtn && els.customPool) {
@@ -626,7 +657,7 @@ renderHistory();
 
 (function initBasicPanelOnMobile() {
   const basic = document.getElementById("basicPanel");
-  if (basic && isMobileViewport()) basic.removeAttribute("open");
+  if (basic && isMobileViewport()) basic.setAttribute("open", "");
 })();
 
 function syncPasteModeVisual() {
