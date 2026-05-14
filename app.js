@@ -545,7 +545,8 @@ function run() {
     els.result.value = list.join(", ");
     if (els.sourceScope && list.length > 0) els.sourceScope.value = "result";
     if (els.result && typeof els.result.scrollIntoView === "function") {
-      els.result.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      const target = isMobileViewport() ? els.result.closest(".result-panel") : els.result;
+      (target || els.result).scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
   } catch (err) {
     alert(err.message || "输入格式有误，请检查后重试。");
