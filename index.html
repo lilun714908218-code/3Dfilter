@@ -59,6 +59,49 @@
             rows="4"
           ></textarea>
         </div>
+
+        <div class="quick-filter-area" id="quickFilterArea">
+          <div class="quick-filter-tabs">
+            <button type="button" class="quick-filter-toggle" data-filter-target="excludeDigitsPanel" data-label="排除数字">
+              排除数字
+            </button>
+            <button type="button" class="quick-filter-toggle" data-filter-target="includeDigitsPanel" data-label="必含数字">
+              必含数字
+            </button>
+          </div>
+
+          <div class="quick-filter-panels">
+            <section class="quick-filter-panel" id="excludeDigitsPanel" hidden>
+              <div class="digit-filter">
+                <div class="digit-filter-title">排除数字</div>
+                <div id="excludeDigitsButtons" class="digit-grid">
+                  <button type="button" class="digit-btn" data-digit="0">0</button>
+                  <button type="button" class="digit-btn" data-digit="1">1</button>
+                  <button type="button" class="digit-btn" data-digit="2">2</button>
+                  <button type="button" class="digit-btn" data-digit="3">3</button>
+                  <button type="button" class="digit-btn" data-digit="4">4</button>
+                  <button type="button" class="digit-btn" data-digit="5">5</button>
+                  <button type="button" class="digit-btn" data-digit="6">6</button>
+                  <button type="button" class="digit-btn" data-digit="7">7</button>
+                  <button type="button" class="digit-btn" data-digit="8">8</button>
+                  <button type="button" class="digit-btn" data-digit="9">9</button>
+                </div>
+              </div>
+            </section>
+
+            <section class="quick-filter-panel" id="includeDigitsPanel" hidden>
+              <label class="picker-label">
+                必含数字
+                <input id="includeDigits" placeholder="如 0,3,8" />
+                <div
+                  class="quick-picker"
+                  data-bind-input="includeDigits"
+                  data-options="0,1,2,3,4,5,6,7,8,9"
+                ></div>
+              </label>
+            </section>
+          </div>
+        </div>
       </section>
 
       <div class="app-layout" id="appLayout">
@@ -67,7 +110,7 @@
             <summary>基础</summary>
             <div class="digit-filter">
               <div class="digit-filter-title">排除数字</div>
-              <div id="excludeDigitsButtons" class="digit-grid">
+              <div id="excludeDigitsButtonsOld" class="digit-grid">
                 <button type="button" class="digit-btn" data-digit="0">0</button>
                 <button type="button" class="digit-btn" data-digit="1">1</button>
                 <button type="button" class="digit-btn" data-digit="2">2</button>

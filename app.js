@@ -381,6 +381,31 @@ function syncInputFromPicker(picker) {
     .map((btn) => btn.dataset.value || "")
     .filter(Boolean);
   setValuesToInput(input, selected);
+  updateQuickFilterButtons();
+}
+
+function closeQuickFilterPanels() {
+  document.querySelectorAll(".quick-filter-panel").forEach((panel) => {
+    panel.hidden = true;
+  });
+  document.querySelectorAll(".quick-filter-toggle").forEach((btn) => {
+    btn.classList.remove("active");
+  });
+}
+
+function updateQuickFilterButtons() {
+  document.querySelectorAll(".quick-filter-toggle").forEach((btn) => {
+    const label = btn.dataset.label || btn.textContent.trim();
+    let count = 0;
+    if (btn.dataset.filterTarget === "excludeDigitsPanel") {
+      count = excludedDigitsByButtons.size;
+    }
+    if (btn.dataset.filterTarget === "includeDigitsPanel" && els.includeDigits) {
+      count = getValuesFromInput(els.includeDigits).length;
+    }
+    btn.textContent = count > 0 ? `${label} ${count}` : label;
+    btn.classList.toggle("has-value", count > 0);
+  });
 }
 
 function setupQuickPickers() {
@@ -462,6 +487,7 @@ function renderExcludeDigitButtons() {
     const digit = Number(btn.dataset.digit);
     btn.classList.toggle("active", excludedDigitsByButtons.has(digit));
   });
+  updateQuickFilterButtons();
 }
 
 function resetVisibleFiltersAfterRun() {
@@ -471,6 +497,8 @@ function resetVisibleFiltersAfterRun() {
   els.excludePair.checked = false;
   els.excludeTriplet.checked = false;
   refreshAllQuickPickers();
+  closeQuickFilterPanels();
+  updateQuickFilterButtons();
 }
 
 function loadHistory() {
@@ -632,6 +660,17 @@ if (els.clearCustomPoolBtn && els.customPool) {
     els.customPool.value = "";
   });
 }
+document.querySelectorAll(".quick-filter-toggle").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const targetId = btn.dataset.filterTarget;
+    const target = targetId ? document.getElementById(targetId) : null;
+    if (!target) return;
+    const willOpen = target.hidden;
+    closeQuickFilterPanels();
+    target.hidden = !willOpen;
+    btn.classList.toggle("active", willOpen);
+  });
+});
 if (els.addHistoryBtn) els.addHistoryBtn.addEventListener("click", addHistoryRecord);
 if (els.clearHistoryBtn) els.clearHistoryBtn.addEventListener("click", clearHistory);
 if (els.excludeDigitsButtons) {
@@ -647,6 +686,7 @@ if (els.excludeDigitsButtons) {
       excludedDigitsByButtons.add(digit);
     }
     renderExcludeDigitButtons();
+    updateQuickFilterButtons();
   });
 }
 if (els.historyList) {
@@ -663,6 +703,7 @@ historyRecords = loadHistory().sort((a, b) => Number(b.issue) - Number(a.issue))
 setupQuickPickers();
 refreshAllQuickPickers();
 renderExcludeDigitButtons();
+updateQuickFilterButtons();
 renderHistory();
 
 (function initBasicPanelOnMobile() {

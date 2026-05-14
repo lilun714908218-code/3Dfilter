@@ -464,7 +464,52 @@ textarea {
   font-size: 12px;
 }
 
+.quick-filter-area {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 10px;
+}
+
+.quick-filter-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.quick-filter-toggle {
+  min-height: 44px;
+  background: #e5e7eb;
+  color: #111827;
+  font-weight: 700;
+}
+
+.quick-filter-toggle.active {
+  background: #2563eb;
+  color: #fff;
+}
+
+.quick-filter-toggle.has-value:not(.active) {
+  background: #dbeafe;
+  color: #1e3a8a;
+}
+
+.quick-filter-panels {
+  margin-top: 8px;
+}
+
+.quick-filter-panel {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 10px;
+  background: #f9fafb;
+}
+
+.quick-filter-panel .picker-label {
+  margin-bottom: 0;
+}
+
 .right-col > .fold,
+.left-col .digit-filter,
+.left-col label:has(#includeDigits),
 label:has(#patternType),
 label:has(#consecutiveType),
 label:has(#excludeSums),
@@ -645,6 +690,20 @@ label:has(#excludeSumTails),
     font-weight: 700;
     border-color: #cbd5e1;
     background: #f8fafc;
+  }
+
+  .quick-filter-area {
+    padding-top: 8px;
+  }
+
+  .quick-filter-toggle {
+    min-height: 46px;
+    border-radius: 10px;
+    font-size: 15px;
+  }
+
+  .quick-filter-panel {
+    padding: 8px;
   }
 
   .global-run-actions {
