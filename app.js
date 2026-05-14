@@ -604,7 +604,8 @@ function getFilterSource() {
   if (mode === "result") {
     const parsed = parseCandidates(els.result.value);
     if (parsed.length === 0) {
-      throw new Error("已选「当前结果」：下方还没有有效号码。请先选「全部号码」或「粘贴框」筛出一批，或把号码粘贴在结果区。");
+      if (els.sourceScope) els.sourceScope.value = "full";
+      return allNumbers();
     }
     return parsed;
   }
@@ -625,7 +626,8 @@ function run() {
       (target || els.result).scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
   } catch (err) {
-    alert(err.message || "输入格式有误，请检查后重试。");
+    if (els.count) els.count.textContent = "0";
+    if (els.result) els.result.value = err.message || "输入格式有误，请检查后重试。";
   }
 }
 
