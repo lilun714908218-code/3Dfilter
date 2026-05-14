@@ -510,6 +510,7 @@ textarea {
 .right-col > .fold,
 .left-col .digit-filter,
 .left-col label:has(#includeDigits),
+.left-col label:has(#includeDigitsOld),
 label:has(#patternType),
 label:has(#consecutiveType),
 label:has(#excludeSums),

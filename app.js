@@ -481,6 +481,16 @@ function refreshAllQuickPickers() {
   document.querySelectorAll(".quick-picker").forEach((picker) => syncPickerFromInput(picker));
 }
 
+function clearPickerSelection(inputId) {
+  const input = document.getElementById(inputId);
+  if (input) input.value = "";
+  document.querySelectorAll(`.quick-picker[data-bind-input="${inputId}"]`).forEach((picker) => {
+    picker.querySelectorAll(".quick-picker-option.active").forEach((btn) => {
+      btn.classList.remove("active");
+    });
+  });
+}
+
 function renderExcludeDigitButtons() {
   const buttons = els.excludeDigitsButtons.querySelectorAll(".digit-btn");
   buttons.forEach((btn) => {
@@ -493,7 +503,7 @@ function renderExcludeDigitButtons() {
 function resetVisibleFiltersAfterRun() {
   excludedDigitsByButtons.clear();
   renderExcludeDigitButtons();
-  els.includeDigits.value = "";
+  clearPickerSelection("includeDigits");
   els.excludePair.checked = false;
   els.excludeTriplet.checked = false;
   refreshAllQuickPickers();
@@ -623,7 +633,7 @@ function reset() {
   rememberUndoState();
   excludedDigitsByButtons.clear();
   renderExcludeDigitButtons();
-  els.includeDigits.value = "";
+  clearPickerSelection("includeDigits");
   els.excludeSums.value = "";
   els.includeSumTails.value = "";
   els.excludeSumTails.value = "";
