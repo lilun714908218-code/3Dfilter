@@ -62,6 +62,24 @@
 
         <div class="quick-filter-area" id="quickFilterArea">
           <div class="quick-filter-tabs">
+            <button type="button" class="quick-filter-toggle" data-filter-target="sumPanel" data-label="和值">
+              和值
+            </button>
+            <button type="button" class="quick-filter-toggle" data-filter-target="tailPanel" data-label="和尾">
+              和尾
+            </button>
+            <button type="button" class="quick-filter-toggle" data-filter-target="spanPanel" data-label="跨度">
+              跨度
+            </button>
+            <button type="button" class="quick-filter-toggle" data-filter-target="routePanel" data-label="012路">
+              012路
+            </button>
+            <button type="button" class="quick-filter-toggle" data-filter-target="bigPanel" data-label="大小">
+              大小
+            </button>
+            <button type="button" class="quick-filter-toggle" data-filter-target="oddPanel" data-label="单双">
+              单双
+            </button>
             <button type="button" class="quick-filter-toggle" data-filter-target="excludeDigitsPanel" data-label="排除数字">
               排除数字
             </button>
@@ -98,6 +116,78 @@
                   data-bind-input="includeDigits"
                   data-options="0,1,2,3,4,5,6,7,8,9"
                 ></div>
+              </label>
+            </section>
+
+            <section class="quick-filter-panel" id="sumPanel" hidden>
+              <div class="filter-range-row">
+                <label>
+                  和值最小
+                  <select id="qSumMin" data-range-min="0" data-range-max="27" data-empty-text="不限"></select>
+                </label>
+                <label>
+                  和值最大
+                  <select id="qSumMax" data-range-min="0" data-range-max="27" data-empty-text="不限"></select>
+                </label>
+              </div>
+              <label class="picker-label">
+                排除和值
+                <input id="qExcludeSums" class="filter-value-input" readonly />
+                <div
+                  class="quick-picker"
+                  data-bind-input="qExcludeSums"
+                  data-options="0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27"
+                ></div>
+              </label>
+            </section>
+
+            <section class="quick-filter-panel" id="tailPanel" hidden>
+              <label class="picker-label">
+                保留和尾
+                <input id="qIncludeSumTails" class="filter-value-input" readonly />
+                <div class="quick-picker" data-bind-input="qIncludeSumTails" data-options="0,1,2,3,4,5,6,7,8,9"></div>
+              </label>
+              <label class="picker-label filter-block-gap">
+                排除和尾
+                <input id="qExcludeSumTails" class="filter-value-input" readonly />
+                <div class="quick-picker" data-bind-input="qExcludeSumTails" data-options="0,1,2,3,4,5,6,7,8,9"></div>
+              </label>
+            </section>
+
+            <section class="quick-filter-panel" id="spanPanel" hidden>
+              <div class="filter-range-row">
+                <label>
+                  跨度最小
+                  <select id="qSpanMin" data-range-min="0" data-range-max="9" data-empty-text="不限"></select>
+                </label>
+                <label>
+                  跨度最大
+                  <select id="qSpanMax" data-range-min="0" data-range-max="9" data-empty-text="不限"></select>
+                </label>
+              </div>
+            </section>
+
+            <section class="quick-filter-panel" id="routePanel" hidden>
+              <label class="picker-label">
+                012路
+                <input id="qRoutes012" class="filter-value-input" readonly />
+                <div class="quick-picker" data-bind-input="qRoutes012" data-options="0,1,2"></div>
+              </label>
+            </section>
+
+            <section class="quick-filter-panel" id="bigPanel" hidden>
+              <label class="picker-label">
+                大数个数（5-9）
+                <input id="qBigCounts" class="filter-value-input" readonly />
+                <div class="quick-picker" data-bind-input="qBigCounts" data-options="0,1,2,3"></div>
+              </label>
+            </section>
+
+            <section class="quick-filter-panel" id="oddPanel" hidden>
+              <label class="picker-label">
+                单数个数
+                <input id="qOddCounts" class="filter-value-input" readonly />
+                <div class="quick-picker" data-bind-input="qOddCounts" data-options="0,1,2,3"></div>
               </label>
             </section>
           </div>

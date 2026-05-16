@@ -471,7 +471,7 @@ textarea {
 
 .quick-filter-tabs {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
   gap: 8px;
 }
 
@@ -505,6 +505,25 @@ textarea {
 
 .quick-filter-panel .picker-label {
   margin-bottom: 0;
+}
+
+.filter-block-gap {
+  margin-top: 10px;
+}
+
+.filter-range-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.filter-range-row label {
+  margin-bottom: 0;
+}
+
+.filter-value-input {
+  display: none;
 }
 
 .right-col > .fold,
@@ -721,7 +740,7 @@ label:has(#excludeSumTails),
   .quick-filter-toggle {
     min-height: 46px;
     border-radius: 10px;
-    font-size: 15px;
+    font-size: 14px;
   }
 
   .quick-filter-panel {
@@ -896,6 +915,10 @@ label:has(#excludeSumTails),
   .quick-picker-tools {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .filter-range-row {
+    grid-template-columns: 1fr 1fr;
   }
 
   label {

@@ -255,13 +255,13 @@ function captureRawFilters() {
   return {
     excludeDigits: [...excludedDigitsByButtons].sort((a, b) => a - b),
     includeDigits: els.includeDigits ? els.includeDigits.value : "",
-    excludeSums: els.excludeSums ? els.excludeSums.value : "",
-    includeSumTails: els.includeSumTails ? els.includeSumTails.value : "",
-    excludeSumTails: els.excludeSumTails ? els.excludeSumTails.value : "",
-    sumMin: els.sumMin ? els.sumMin.value : "",
-    sumMax: els.sumMax ? els.sumMax.value : "",
-    spanMin: els.spanMin ? els.spanMin.value : "",
-    spanMax: els.spanMax ? els.spanMax.value : "",
+    excludeSums: els.qExcludeSums ? els.qExcludeSums.value : (els.excludeSums ? els.excludeSums.value : ""),
+    includeSumTails: els.qIncludeSumTails ? els.qIncludeSumTails.value : (els.includeSumTails ? els.includeSumTails.value : ""),
+    excludeSumTails: els.qExcludeSumTails ? els.qExcludeSumTails.value : (els.excludeSumTails ? els.excludeSumTails.value : ""),
+    sumMin: els.qSumMin ? els.qSumMin.value : (els.sumMin ? els.sumMin.value : ""),
+    sumMax: els.qSumMax ? els.qSumMax.value : (els.sumMax ? els.sumMax.value : ""),
+    spanMin: els.qSpanMin ? els.qSpanMin.value : (els.spanMin ? els.spanMin.value : ""),
+    spanMax: els.qSpanMax ? els.qSpanMax.value : (els.spanMax ? els.spanMax.value : ""),
     patternType: els.patternType ? els.patternType.value : "all",
     playMode: els.playMode ? els.playMode.value : "direct",
     consecutiveType: els.consecutiveType ? els.consecutiveType.value : "all",
@@ -269,9 +269,9 @@ function captureRawFilters() {
     excludeTriplet: els.excludeTriplet ? els.excludeTriplet.checked : false,
     danmaDigits: "",
     killDigits: "",
-    oddCounts: "",
-    bigCounts: "",
-    routes012: "",
+    oddCounts: els.qOddCounts ? els.qOddCounts.value : "",
+    bigCounts: els.qBigCounts ? els.qBigCounts.value : "",
+    routes012: els.qRoutes012 ? els.qRoutes012.value : "",
     posBInclude: "",
     posSInclude: "",
     posGInclude: "",
@@ -313,6 +313,16 @@ function undoLastChange() {
 const els = {
   excludeDigitsButtons: document.getElementById("excludeDigitsButtons"),
   includeDigits: document.getElementById("includeDigits"),
+  qExcludeSums: document.getElementById("qExcludeSums"),
+  qIncludeSumTails: document.getElementById("qIncludeSumTails"),
+  qExcludeSumTails: document.getElementById("qExcludeSumTails"),
+  qSumMin: document.getElementById("qSumMin"),
+  qSumMax: document.getElementById("qSumMax"),
+  qSpanMin: document.getElementById("qSpanMin"),
+  qSpanMax: document.getElementById("qSpanMax"),
+  qRoutes012: document.getElementById("qRoutes012"),
+  qBigCounts: document.getElementById("qBigCounts"),
+  qOddCounts: document.getElementById("qOddCounts"),
   excludeSums: document.getElementById("excludeSums"),
   includeSumTails: document.getElementById("includeSumTails"),
   excludeSumTails: document.getElementById("excludeSumTails"),
@@ -404,8 +414,51 @@ function updateQuickFilterButtons() {
     if (btn.dataset.filterTarget === "includeDigitsPanel" && els.includeDigits) {
       count = getValuesFromInput(els.includeDigits).length;
     }
+    if (btn.dataset.filterTarget === "sumPanel") {
+      count =
+        getValuesFromInput(els.qExcludeSums).length +
+        (els.qSumMin && els.qSumMin.value ? 1 : 0) +
+        (els.qSumMax && els.qSumMax.value ? 1 : 0);
+    }
+    if (btn.dataset.filterTarget === "tailPanel") {
+      count = getValuesFromInput(els.qIncludeSumTails).length + getValuesFromInput(els.qExcludeSumTails).length;
+    }
+    if (btn.dataset.filterTarget === "spanPanel") {
+      count = (els.qSpanMin && els.qSpanMin.value ? 1 : 0) + (els.qSpanMax && els.qSpanMax.value ? 1 : 0);
+    }
+    if (btn.dataset.filterTarget === "routePanel") {
+      count = getValuesFromInput(els.qRoutes012).length;
+    }
+    if (btn.dataset.filterTarget === "bigPanel") {
+      count = getValuesFromInput(els.qBigCounts).length;
+    }
+    if (btn.dataset.filterTarget === "oddPanel") {
+      count = getValuesFromInput(els.qOddCounts).length;
+    }
     btn.textContent = count > 0 ? `${label} ${count}` : label;
     btn.classList.toggle("has-value", count > 0);
+  });
+}
+
+function setupRangeSelects() {
+  document.querySelectorAll("select[data-range-min][data-range-max]").forEach((select) => {
+    const current = select.value;
+    const min = Number(select.dataset.rangeMin || "0");
+    const max = Number(select.dataset.rangeMax || "0");
+    const emptyText = select.dataset.emptyText || "不限";
+    select.innerHTML = "";
+    const empty = document.createElement("option");
+    empty.value = "";
+    empty.textContent = emptyText;
+    select.appendChild(empty);
+    for (let value = min; value <= max; value += 1) {
+      const option = document.createElement("option");
+      option.value = String(value);
+      option.textContent = String(value);
+      select.appendChild(option);
+    }
+    select.value = current;
+    select.addEventListener("change", updateQuickFilterButtons);
   });
 }
 
@@ -506,6 +559,15 @@ function resetVisibleFiltersAfterRun() {
   excludedDigitsByButtons.clear();
   renderExcludeDigitButtons();
   clearPickerSelection("includeDigits");
+  clearPickerSelection("qExcludeSums");
+  clearPickerSelection("qIncludeSumTails");
+  clearPickerSelection("qExcludeSumTails");
+  clearPickerSelection("qRoutes012");
+  clearPickerSelection("qBigCounts");
+  clearPickerSelection("qOddCounts");
+  [els.qSumMin, els.qSumMax, els.qSpanMin, els.qSpanMax].forEach((select) => {
+    if (select) select.value = "";
+  });
   if (els.excludePair) els.excludePair.checked = false;
   if (els.excludeTriplet) els.excludeTriplet.checked = false;
   refreshAllQuickPickers();
@@ -638,6 +700,15 @@ function reset() {
   excludedDigitsByButtons.clear();
   renderExcludeDigitButtons();
   clearPickerSelection("includeDigits");
+  clearPickerSelection("qExcludeSums");
+  clearPickerSelection("qIncludeSumTails");
+  clearPickerSelection("qExcludeSumTails");
+  clearPickerSelection("qRoutes012");
+  clearPickerSelection("qBigCounts");
+  clearPickerSelection("qOddCounts");
+  [els.qSumMin, els.qSumMax, els.qSpanMin, els.qSpanMax].forEach((select) => {
+    if (select) select.value = "";
+  });
   if (els.excludeSums) els.excludeSums.value = "";
   if (els.includeSumTails) els.includeSumTails.value = "";
   if (els.excludeSumTails) els.excludeSumTails.value = "";
@@ -714,6 +785,7 @@ if (els.historyList) {
 }
 
 historyRecords = loadHistory().sort((a, b) => Number(b.issue) - Number(a.issue));
+setupRangeSelects();
 setupQuickPickers();
 refreshAllQuickPickers();
 renderExcludeDigitButtons();
