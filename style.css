@@ -471,15 +471,23 @@ textarea {
 
 .quick-filter-tabs {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 8px;
 }
 
 .quick-filter-toggle {
-  min-height: 44px;
+  min-height: 36px;
   background: #e5e7eb;
   color: #111827;
   font-weight: 700;
+  padding: 7px 6px;
+  font-size: 13px;
+}
+
+.quick-filter-toggle.primary-filter {
+  grid-column: span 3;
+  min-height: 46px;
+  font-size: 15px;
 }
 
 .quick-filter-toggle.active {
@@ -738,9 +746,14 @@ label:has(#excludeSumTails),
   }
 
   .quick-filter-toggle {
-    min-height: 46px;
+    min-height: 36px;
     border-radius: 10px;
-    font-size: 14px;
+    font-size: 13px;
+  }
+
+  .quick-filter-toggle.primary-filter {
+    min-height: 48px;
+    font-size: 15px;
   }
 
   .quick-filter-panel {
