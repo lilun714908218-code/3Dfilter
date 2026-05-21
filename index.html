@@ -155,16 +155,16 @@
             </section>
 
             <section class="quick-filter-panel" id="spanPanel" hidden>
-              <div class="filter-range-row">
-                <label>
-                  跨度最小
-                  <select id="qSpanMin" data-range-min="0" data-range-max="9" data-empty-text="不限"></select>
-                </label>
-                <label>
-                  跨度最大
-                  <select id="qSpanMax" data-range-min="0" data-range-max="9" data-empty-text="不限"></select>
-                </label>
-              </div>
+              <label class="picker-label">
+                保留跨度
+                <input id="qIncludeSpans" class="filter-value-input" readonly />
+                <div class="quick-picker" data-bind-input="qIncludeSpans" data-options="0,1,2,3,4,5,6,7,8,9"></div>
+              </label>
+              <label class="picker-label filter-block-gap">
+                排除跨度
+                <input id="qExcludeSpans" class="filter-value-input" readonly />
+                <div class="quick-picker" data-bind-input="qExcludeSpans" data-options="0,1,2,3,4,5,6,7,8,9"></div>
+              </label>
             </section>
 
             <section class="quick-filter-panel" id="routePanel" hidden>

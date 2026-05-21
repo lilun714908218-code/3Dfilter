@@ -151,6 +151,8 @@ function shouldKeepNumber(text, config) {
   if (config.excludeSums.has(sum)) return false;
   if (config.includeSumTails.size > 0 && !config.includeSumTails.has(sumTail)) return false;
   if (config.excludeSumTails.has(sumTail)) return false;
+  if (config.includeSpans.size > 0 && !config.includeSpans.has(span)) return false;
+  if (config.excludeSpans.has(span)) return false;
   if (config.sumMin !== null && sum < config.sumMin) return false;
   if (config.sumMax !== null && sum > config.sumMax) return false;
   if (config.spanMin !== null && span < config.spanMin) return false;
@@ -213,6 +215,8 @@ function buildConfigFromRaw(raw) {
     excludeSums: parseNumberSet(raw.excludeSums),
     includeSumTails: parseDigitSet(raw.includeSumTails),
     excludeSumTails: parseDigitSet(raw.excludeSumTails),
+    includeSpans: parseDigitSet(raw.includeSpans),
+    excludeSpans: parseDigitSet(raw.excludeSpans),
     sumMin: parseBound(raw.sumMin, "和值最小值", 0, 27),
     sumMax: parseBound(raw.sumMax, "和值最大值", 0, 27),
     spanMin: parseBound(raw.spanMin, "跨度最小值", 0, 9),
@@ -258,6 +262,8 @@ function captureRawFilters() {
     excludeSums: els.qExcludeSums ? els.qExcludeSums.value : (els.excludeSums ? els.excludeSums.value : ""),
     includeSumTails: els.qIncludeSumTails ? els.qIncludeSumTails.value : (els.includeSumTails ? els.includeSumTails.value : ""),
     excludeSumTails: els.qExcludeSumTails ? els.qExcludeSumTails.value : (els.excludeSumTails ? els.excludeSumTails.value : ""),
+    includeSpans: els.qIncludeSpans ? els.qIncludeSpans.value : "",
+    excludeSpans: els.qExcludeSpans ? els.qExcludeSpans.value : "",
     sumMin: els.qSumMin ? els.qSumMin.value : (els.sumMin ? els.sumMin.value : ""),
     sumMax: els.qSumMax ? els.qSumMax.value : (els.sumMax ? els.sumMax.value : ""),
     spanMin: els.qSpanMin ? els.qSpanMin.value : (els.spanMin ? els.spanMin.value : ""),
@@ -316,6 +322,8 @@ const els = {
   qExcludeSums: document.getElementById("qExcludeSums"),
   qIncludeSumTails: document.getElementById("qIncludeSumTails"),
   qExcludeSumTails: document.getElementById("qExcludeSumTails"),
+  qIncludeSpans: document.getElementById("qIncludeSpans"),
+  qExcludeSpans: document.getElementById("qExcludeSpans"),
   qSumMin: document.getElementById("qSumMin"),
   qSumMax: document.getElementById("qSumMax"),
   qSpanMin: document.getElementById("qSpanMin"),
@@ -362,8 +370,9 @@ function isMobileViewport() {
 }
 
 function getValuesFromInput(input) {
-  if (!input || typeof input.value !== "string") return [];
-  return input.value
+  const value = typeof input === "string" ? input : input && input.value;
+  if (typeof value !== "string") return [];
+  return value
     .split(/[,\uff0c\s;；、|]+/)
     .map((s) => s.trim())
     .filter((s) => s !== "");
@@ -424,7 +433,7 @@ function updateQuickFilterButtons() {
       count = getValuesFromInput(els.qIncludeSumTails).length + getValuesFromInput(els.qExcludeSumTails).length;
     }
     if (btn.dataset.filterTarget === "spanPanel") {
-      count = (els.qSpanMin && els.qSpanMin.value ? 1 : 0) + (els.qSpanMax && els.qSpanMax.value ? 1 : 0);
+      count = getValuesFromInput(els.qIncludeSpans).length + getValuesFromInput(els.qExcludeSpans).length;
     }
     if (btn.dataset.filterTarget === "routePanel") {
       count = getValuesFromInput(els.qRoutes012).length;
@@ -562,6 +571,8 @@ function resetVisibleFiltersAfterRun() {
   clearPickerSelection("qExcludeSums");
   clearPickerSelection("qIncludeSumTails");
   clearPickerSelection("qExcludeSumTails");
+  clearPickerSelection("qIncludeSpans");
+  clearPickerSelection("qExcludeSpans");
   clearPickerSelection("qRoutes012");
   clearPickerSelection("qBigCounts");
   clearPickerSelection("qOddCounts");
@@ -703,6 +714,8 @@ function reset() {
   clearPickerSelection("qExcludeSums");
   clearPickerSelection("qIncludeSumTails");
   clearPickerSelection("qExcludeSumTails");
+  clearPickerSelection("qIncludeSpans");
+  clearPickerSelection("qExcludeSpans");
   clearPickerSelection("qRoutes012");
   clearPickerSelection("qBigCounts");
   clearPickerSelection("qOddCounts");
