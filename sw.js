@@ -1,4 +1,4 @@
-const CACHE_NAME = "lottery3d-pwa-v9";
+const CACHE_NAME = "lottery3d-pwa-v10";
 const PRECACHE_URLS = [
   "./",
   "./index.html",
@@ -26,6 +26,24 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
+
+  const url = new URL(event.request.url);
+  const shouldRefreshFirst =
+    url.origin === self.location.origin &&
+    ["document", "script", "style"].includes(event.request.destination);
+
+  if (shouldRefreshFirst) {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          const cloned = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, cloned));
+          return networkResponse;
+        })
+        .catch(() => caches.match(event.request).then((cached) => cached || caches.match("./index.html")))
+    );
+    return;
+  }
 
   event.respondWith(
     caches.match(event.request).then((cached) => {

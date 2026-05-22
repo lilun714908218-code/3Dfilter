@@ -177,17 +177,47 @@
 
             <section class="quick-filter-panel" id="bigPanel" hidden>
               <label class="picker-label">
-                大数个数（5-9）
-                <input id="qBigCounts" class="filter-value-input" readonly />
-                <div class="quick-picker" data-bind-input="qBigCounts" data-options="0,1,2,3"></div>
+                保留大小
+                <input id="qIncludeBigCounts" class="filter-value-input" readonly />
+                <div
+                  class="quick-picker"
+                  data-bind-input="qIncludeBigCounts"
+                  data-options="0,1,2,3"
+                  data-option-labels="0大,1大,2大,3大"
+                ></div>
+              </label>
+              <label class="picker-label filter-block-gap">
+                排除大小
+                <input id="qExcludeBigCounts" class="filter-value-input" readonly />
+                <div
+                  class="quick-picker"
+                  data-bind-input="qExcludeBigCounts"
+                  data-options="0,1,2,3"
+                  data-option-labels="0大,1大,2大,3大"
+                ></div>
               </label>
             </section>
 
             <section class="quick-filter-panel" id="oddPanel" hidden>
               <label class="picker-label">
-                单数个数
-                <input id="qOddCounts" class="filter-value-input" readonly />
-                <div class="quick-picker" data-bind-input="qOddCounts" data-options="0,1,2,3"></div>
+                保留单双
+                <input id="qIncludeOddCounts" class="filter-value-input" readonly />
+                <div
+                  class="quick-picker"
+                  data-bind-input="qIncludeOddCounts"
+                  data-options="0,1,2,3"
+                  data-option-labels="0单,1单,2单,3单"
+                ></div>
+              </label>
+              <label class="picker-label filter-block-gap">
+                排除单双
+                <input id="qExcludeOddCounts" class="filter-value-input" readonly />
+                <div
+                  class="quick-picker"
+                  data-bind-input="qExcludeOddCounts"
+                  data-options="0,1,2,3"
+                  data-option-labels="0单,1单,2单,3单"
+                ></div>
               </label>
             </section>
           </div>
@@ -389,8 +419,17 @@
     <script src="./app.js"></script>
     <script>
       if ("serviceWorker" in navigator) {
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener("controllerchange", () => {
+          if (refreshing) return;
+          refreshing = true;
+          window.location.reload();
+        });
         window.addEventListener("load", () => {
-          navigator.serviceWorker.register("./sw.js").catch(() => {});
+          navigator.serviceWorker
+            .register("./sw.js")
+            .then((registration) => registration.update())
+            .catch(() => {});
         });
       }
     </script>

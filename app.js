@@ -176,8 +176,10 @@ function shouldKeepNumber(text, config) {
     if (!hitDanma) return false;
   }
 
-  if (config.oddCounts.size > 0 && !config.oddCounts.has(oddCount)) return false;
-  if (config.bigCounts.size > 0 && !config.bigCounts.has(bigCount)) return false;
+  if (config.includeOddCounts.size > 0 && !config.includeOddCounts.has(oddCount)) return false;
+  if (config.excludeOddCounts.has(oddCount)) return false;
+  if (config.includeBigCounts.size > 0 && !config.includeBigCounts.has(bigCount)) return false;
+  if (config.excludeBigCounts.has(bigCount)) return false;
 
   if (config.routes012.size > 0) {
     const hitRoute = [...routes].some((r) => config.routes012.has(r));
@@ -228,8 +230,10 @@ function buildConfigFromRaw(raw) {
     excludeTriplet: raw.excludeTriplet,
     danmaDigits: parseDigitSet(raw.danmaDigits),
     killDigits: parseDigitSet(raw.killDigits),
-    oddCounts: parseSmallCountSet(raw.oddCounts, "奇数个数"),
-    bigCounts: parseSmallCountSet(raw.bigCounts, "大数个数"),
+    includeOddCounts: parseSmallCountSet(raw.includeOddCounts || raw.oddCounts || "", "保留单双"),
+    excludeOddCounts: parseSmallCountSet(raw.excludeOddCounts || "", "排除单双"),
+    includeBigCounts: parseSmallCountSet(raw.includeBigCounts || raw.bigCounts || "", "保留大小"),
+    excludeBigCounts: parseSmallCountSet(raw.excludeBigCounts || "", "排除大小"),
     routes012: parseDigitSet(raw.routes012),
     posBInclude: parseDigitSet(raw.posBInclude),
     posSInclude: parseDigitSet(raw.posSInclude),
@@ -275,8 +279,10 @@ function captureRawFilters() {
     excludeTriplet: els.excludeTriplet ? els.excludeTriplet.checked : false,
     danmaDigits: "",
     killDigits: "",
-    oddCounts: els.qOddCounts ? els.qOddCounts.value : "",
-    bigCounts: els.qBigCounts ? els.qBigCounts.value : "",
+    includeOddCounts: els.qIncludeOddCounts ? els.qIncludeOddCounts.value : "",
+    excludeOddCounts: els.qExcludeOddCounts ? els.qExcludeOddCounts.value : "",
+    includeBigCounts: els.qIncludeBigCounts ? els.qIncludeBigCounts.value : "",
+    excludeBigCounts: els.qExcludeBigCounts ? els.qExcludeBigCounts.value : "",
     routes012: els.qRoutes012 ? els.qRoutes012.value : "",
     posBInclude: "",
     posSInclude: "",
@@ -329,8 +335,10 @@ const els = {
   qSpanMin: document.getElementById("qSpanMin"),
   qSpanMax: document.getElementById("qSpanMax"),
   qRoutes012: document.getElementById("qRoutes012"),
-  qBigCounts: document.getElementById("qBigCounts"),
-  qOddCounts: document.getElementById("qOddCounts"),
+  qIncludeBigCounts: document.getElementById("qIncludeBigCounts"),
+  qExcludeBigCounts: document.getElementById("qExcludeBigCounts"),
+  qIncludeOddCounts: document.getElementById("qIncludeOddCounts"),
+  qExcludeOddCounts: document.getElementById("qExcludeOddCounts"),
   excludeSums: document.getElementById("excludeSums"),
   includeSumTails: document.getElementById("includeSumTails"),
   excludeSumTails: document.getElementById("excludeSumTails"),
@@ -439,10 +447,10 @@ function updateQuickFilterButtons() {
       count = getValuesFromInput(els.qRoutes012).length;
     }
     if (btn.dataset.filterTarget === "bigPanel") {
-      count = getValuesFromInput(els.qBigCounts).length;
+      count = getValuesFromInput(els.qIncludeBigCounts).length + getValuesFromInput(els.qExcludeBigCounts).length;
     }
     if (btn.dataset.filterTarget === "oddPanel") {
-      count = getValuesFromInput(els.qOddCounts).length;
+      count = getValuesFromInput(els.qIncludeOddCounts).length + getValuesFromInput(els.qExcludeOddCounts).length;
     }
     btn.textContent = count > 0 ? `${label} ${count}` : label;
     btn.classList.toggle("has-value", count > 0);
@@ -478,6 +486,9 @@ function setupQuickPickers() {
       .split(",")
       .map((v) => v.trim())
       .filter(Boolean);
+    const labels = (picker.dataset.optionLabels || "")
+      .split(",")
+      .map((v) => v.trim());
 
     const toolBar = document.createElement("div");
     toolBar.className = "quick-picker-tools";
@@ -497,12 +508,12 @@ function setupQuickPickers() {
 
     const grid = document.createElement("div");
     grid.className = `quick-picker-grid ${options.length <= 4 ? "small" : ""}`.trim();
-    options.forEach((value) => {
+    options.forEach((value, index) => {
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = "quick-picker-option";
       btn.dataset.value = value;
-      btn.textContent = value;
+      btn.textContent = labels[index] || value;
       grid.appendChild(btn);
     });
 
@@ -574,8 +585,10 @@ function resetVisibleFiltersAfterRun() {
   clearPickerSelection("qIncludeSpans");
   clearPickerSelection("qExcludeSpans");
   clearPickerSelection("qRoutes012");
-  clearPickerSelection("qBigCounts");
-  clearPickerSelection("qOddCounts");
+  clearPickerSelection("qIncludeBigCounts");
+  clearPickerSelection("qExcludeBigCounts");
+  clearPickerSelection("qIncludeOddCounts");
+  clearPickerSelection("qExcludeOddCounts");
   [els.qSumMin, els.qSumMax, els.qSpanMin, els.qSpanMax].forEach((select) => {
     if (select) select.value = "";
   });
@@ -717,8 +730,10 @@ function reset() {
   clearPickerSelection("qIncludeSpans");
   clearPickerSelection("qExcludeSpans");
   clearPickerSelection("qRoutes012");
-  clearPickerSelection("qBigCounts");
-  clearPickerSelection("qOddCounts");
+  clearPickerSelection("qIncludeBigCounts");
+  clearPickerSelection("qExcludeBigCounts");
+  clearPickerSelection("qIncludeOddCounts");
+  clearPickerSelection("qExcludeOddCounts");
   [els.qSumMin, els.qSumMax, els.qSpanMin, els.qSpanMax].forEach((select) => {
     if (select) select.value = "";
   });
