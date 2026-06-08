@@ -1,4 +1,4 @@
-const CACHE_NAME = "lottery3d-pwa-v10";
+const CACHE_NAME = "lottery3d-pwa-v11";
 const PRECACHE_URLS = [
   "./",
   "./index.html",

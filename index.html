@@ -74,6 +74,12 @@
             <button type="button" class="quick-filter-toggle" data-filter-target="tailPanel" data-label="和尾">
               和尾
             </button>
+            <button type="button" class="quick-filter-toggle" data-filter-target="groupPanel" data-label="组态">
+              组态
+            </button>
+            <button type="button" class="quick-filter-toggle" data-filter-target="twoCodePanel" data-label="2码">
+              2码
+            </button>
             <button type="button" class="quick-filter-toggle" data-filter-target="spanPanel" data-label="跨度">
               跨度
             </button>
@@ -164,6 +170,40 @@
                 排除跨度
                 <input id="qExcludeSpans" class="filter-value-input" readonly />
                 <div class="quick-picker" data-bind-input="qExcludeSpans" data-options="0,1,2,3,4,5,6,7,8,9"></div>
+              </label>
+            </section>
+
+            <section class="quick-filter-panel" id="groupPanel" hidden>
+              <label class="picker-label">
+                保留组态
+                <input id="qIncludeGroups" class="filter-value-input" readonly />
+                <div
+                  class="quick-picker"
+                  data-bind-input="qIncludeGroups"
+                  data-options="group3,group6"
+                  data-option-labels="组3,组6"
+                ></div>
+              </label>
+            </section>
+
+            <section class="quick-filter-panel" id="twoCodePanel" hidden>
+              <label class="picker-label">
+                保留2码组合
+                <input id="qIncludeTwoCodeCombos" class="filter-value-input" readonly />
+                <div
+                  class="quick-picker two-code-picker"
+                  data-bind-input="qIncludeTwoCodeCombos"
+                  data-options="00,01,02,03,04,05,06,07,08,09,11,12,13,14,15,16,17,18,19,22,23,24,25,26,27,28,29,33,34,35,36,37,38,39,44,45,46,47,48,49,55,56,57,58,59,66,67,68,69,77,78,79,88,89,99"
+                ></div>
+              </label>
+              <label class="picker-label filter-block-gap">
+                排除2码组合
+                <input id="qExcludeTwoCodeCombos" class="filter-value-input" readonly />
+                <div
+                  class="quick-picker two-code-picker"
+                  data-bind-input="qExcludeTwoCodeCombos"
+                  data-options="00,01,02,03,04,05,06,07,08,09,11,12,13,14,15,16,17,18,19,22,23,24,25,26,27,28,29,33,34,35,36,37,38,39,44,45,46,47,48,49,55,56,57,58,59,66,67,68,69,77,78,79,88,89,99"
+                ></div>
               </label>
             </section>
 

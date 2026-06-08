@@ -29,6 +29,38 @@ function parseSmallCountSet(raw, label) {
   return new Set(parsed);
 }
 
+function parseGroupSet(raw) {
+  if (!raw.trim()) return new Set();
+  const values = raw
+    .split(/[,\uff0c\s;；、|]+/)
+    .map((s) => s.trim())
+    .filter((s) => s !== "");
+  const allowed = new Set(["group3", "group6"]);
+  values.forEach((value) => {
+    if (!allowed.has(value)) {
+      throw new Error(`组态输入无效：${value}`);
+    }
+  });
+  return new Set(values);
+}
+
+function normalizeTwoCodeCombo(value) {
+  if (!/^\d{2}$/.test(value)) {
+    throw new Error(`2码组合输入无效：${value}（请使用两位数字，如 12）`);
+  }
+  return value.split("").sort().join("");
+}
+
+function parseTwoCodeSet(raw) {
+  if (!raw.trim()) return new Set();
+  const values = raw
+    .split(/[,\uff0c\s;；、|]+/)
+    .map((s) => s.trim())
+    .filter((s) => s !== "")
+    .map(normalizeTwoCodeCombo);
+  return new Set(values);
+}
+
 function parseNumberSet(raw) {
   if (!raw.trim()) return new Set();
   const values = raw
@@ -93,6 +125,16 @@ function hasConsecutiveDigits(digits) {
   return false;
 }
 
+function getTwoCodeCombos(digits) {
+  const combos = new Set();
+  for (let i = 0; i < digits.length - 1; i += 1) {
+    for (let j = i + 1; j < digits.length; j += 1) {
+      combos.add([digits[i], digits[j]].sort((a, b) => a - b).join(""));
+    }
+  }
+  return combos;
+}
+
 function formatNum(n) {
   return n.toString().padStart(3, "0");
 }
@@ -142,6 +184,7 @@ function shouldKeepNumber(text, config) {
   const oddCount = digits.filter((d) => d % 2 === 1).length;
   const bigCount = digits.filter((d) => d >= 5).length;
   const hasConsecutive = hasConsecutiveDigits(digits);
+  const twoCodeCombos = getTwoCodeCombos(digits);
   const routes = new Set(digits.map((d) => d % 3));
   const { isPair, isTriplet } = classify(digits);
   const isAllDiff = !isPair && !isTriplet;
@@ -163,6 +206,10 @@ function shouldKeepNumber(text, config) {
   if (config.patternType === "triplet" && !isTriplet) return false;
   if (config.patternType === "pair" && !isPair) return false;
   if (config.patternType === "allDiff" && !isAllDiff) return false;
+  if (config.includeGroups.size > 0) {
+    const hitGroup = (isPair && config.includeGroups.has("group3")) || (isAllDiff && config.includeGroups.has("group6"));
+    if (!hitGroup) return false;
+  }
   if (config.consecutiveType === "has" && !hasConsecutive) return false;
   if (config.consecutiveType === "no" && hasConsecutive) return false;
 
@@ -180,6 +227,12 @@ function shouldKeepNumber(text, config) {
   if (config.excludeOddCounts.has(oddCount)) return false;
   if (config.includeBigCounts.size > 0 && !config.includeBigCounts.has(bigCount)) return false;
   if (config.excludeBigCounts.has(bigCount)) return false;
+
+  if (config.includeTwoCodeCombos.size > 0) {
+    const hitTwoCode = [...config.includeTwoCodeCombos].some((combo) => twoCodeCombos.has(combo));
+    if (!hitTwoCode) return false;
+  }
+  if ([...config.excludeTwoCodeCombos].some((combo) => twoCodeCombos.has(combo))) return false;
 
   if (config.routes012.size > 0) {
     const hitRoute = [...routes].some((r) => config.routes012.has(r));
@@ -223,6 +276,9 @@ function buildConfigFromRaw(raw) {
     sumMax: parseBound(raw.sumMax, "和值最大值", 0, 27),
     spanMin: parseBound(raw.spanMin, "跨度最小值", 0, 9),
     spanMax: parseBound(raw.spanMax, "跨度最大值", 0, 9),
+    includeGroups: parseGroupSet(raw.includeGroups || ""),
+    includeTwoCodeCombos: parseTwoCodeSet(raw.includeTwoCodeCombos || ""),
+    excludeTwoCodeCombos: parseTwoCodeSet(raw.excludeTwoCodeCombos || ""),
     patternType: raw.patternType,
     playMode: raw.playMode,
     consecutiveType: raw.consecutiveType,
@@ -272,6 +328,9 @@ function captureRawFilters() {
     sumMax: els.qSumMax ? els.qSumMax.value : (els.sumMax ? els.sumMax.value : ""),
     spanMin: els.qSpanMin ? els.qSpanMin.value : (els.spanMin ? els.spanMin.value : ""),
     spanMax: els.qSpanMax ? els.qSpanMax.value : (els.spanMax ? els.spanMax.value : ""),
+    includeGroups: els.qIncludeGroups ? els.qIncludeGroups.value : "",
+    includeTwoCodeCombos: els.qIncludeTwoCodeCombos ? els.qIncludeTwoCodeCombos.value : "",
+    excludeTwoCodeCombos: els.qExcludeTwoCodeCombos ? els.qExcludeTwoCodeCombos.value : "",
     patternType: els.patternType ? els.patternType.value : "all",
     playMode: els.playMode ? els.playMode.value : "direct",
     consecutiveType: els.consecutiveType ? els.consecutiveType.value : "all",
@@ -334,6 +393,9 @@ const els = {
   qSumMax: document.getElementById("qSumMax"),
   qSpanMin: document.getElementById("qSpanMin"),
   qSpanMax: document.getElementById("qSpanMax"),
+  qIncludeGroups: document.getElementById("qIncludeGroups"),
+  qIncludeTwoCodeCombos: document.getElementById("qIncludeTwoCodeCombos"),
+  qExcludeTwoCodeCombos: document.getElementById("qExcludeTwoCodeCombos"),
   qRoutes012: document.getElementById("qRoutes012"),
   qIncludeBigCounts: document.getElementById("qIncludeBigCounts"),
   qExcludeBigCounts: document.getElementById("qExcludeBigCounts"),
@@ -442,6 +504,13 @@ function updateQuickFilterButtons() {
     }
     if (btn.dataset.filterTarget === "spanPanel") {
       count = getValuesFromInput(els.qIncludeSpans).length + getValuesFromInput(els.qExcludeSpans).length;
+    }
+    if (btn.dataset.filterTarget === "groupPanel") {
+      count = getValuesFromInput(els.qIncludeGroups).length;
+    }
+    if (btn.dataset.filterTarget === "twoCodePanel") {
+      count =
+        getValuesFromInput(els.qIncludeTwoCodeCombos).length + getValuesFromInput(els.qExcludeTwoCodeCombos).length;
     }
     if (btn.dataset.filterTarget === "routePanel") {
       count = getValuesFromInput(els.qRoutes012).length;
@@ -584,6 +653,9 @@ function resetVisibleFiltersAfterRun() {
   clearPickerSelection("qExcludeSumTails");
   clearPickerSelection("qIncludeSpans");
   clearPickerSelection("qExcludeSpans");
+  clearPickerSelection("qIncludeGroups");
+  clearPickerSelection("qIncludeTwoCodeCombos");
+  clearPickerSelection("qExcludeTwoCodeCombos");
   clearPickerSelection("qRoutes012");
   clearPickerSelection("qIncludeBigCounts");
   clearPickerSelection("qExcludeBigCounts");
@@ -729,6 +801,9 @@ function reset() {
   clearPickerSelection("qExcludeSumTails");
   clearPickerSelection("qIncludeSpans");
   clearPickerSelection("qExcludeSpans");
+  clearPickerSelection("qIncludeGroups");
+  clearPickerSelection("qIncludeTwoCodeCombos");
+  clearPickerSelection("qExcludeTwoCodeCombos");
   clearPickerSelection("qRoutes012");
   clearPickerSelection("qIncludeBigCounts");
   clearPickerSelection("qExcludeBigCounts");
